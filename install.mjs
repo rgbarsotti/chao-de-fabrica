@@ -94,7 +94,10 @@ function ganchos(raiz) {
       { matcher: "Bash|PowerShell|Read|NotebookEdit", hooks: [h("trava-segredo", 5)] },
       { hooks: [h("parada-dura", 5)] },
     ],
-    PostToolUse: [{ hooks: [h("salvar-agenda", 5), h("compact-seguro", 5)] }],
+    PostToolUse: [
+      { hooks: [h("salvar-agenda", 5), h("compact-seguro", 5)] },
+      { matcher: "Bash|PowerShell", hooks: [{ ...h("wsl-ocioso", 40), async: true }] },
+    ],
     UserPromptSubmit: [{ hooks: [h("travas-comando", 10)] }, { hooks: [h("salvar-agenda", 5), h("compact-seguro", 5)] }],
     SessionStart: [{ matcher: "compact", hooks: [h("pos-compact", 15)] }],
     PreCompact: [{ hooks: [h("compact-seguro", 10)] }],
@@ -255,7 +258,7 @@ function verificar(c) {
     });
     const saida = execFileSync(process.execPath, [join(c.raizInstalada, "statusline.mjs")], { input: amostra, env, encoding: "utf8" });
     if (!/ctx/.test(saida) || !/falta/.test(saida)) falhar("a barra não produziu a linha esperada");
-    for (const nome of ["parada-dura", "salvar-agenda", "compact-seguro", "travas-comando", "pos-compact", "trava-segredo", "trava-escopo"]) {
+    for (const nome of ["parada-dura", "salvar-agenda", "compact-seguro", "travas-comando", "pos-compact", "trava-segredo", "trava-escopo", "wsl-ocioso"]) {
       execFileSync(process.execPath, [join(c.raizInstalada, "hooks", `${nome}.mjs`)], { input: "{}", env, encoding: "utf8" });
     }
     console.log(`OK: ${m.arquivos.length} arquivos, ${nossos.length} ganchos e barra de status funcionando.`);

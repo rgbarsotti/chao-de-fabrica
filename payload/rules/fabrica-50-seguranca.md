@@ -12,10 +12,26 @@ Vale onde exista credencial: arquivo, variável de ambiente, metadado de contain
 - Se o formato importa, pergunte ao dono. Credencial exposta em log ou transcript é irrecuperável.
 - **Segredo nunca em argv,** sempre `env_file` com permissão 600. Para USAR a credencial, rode o
   código dentro do ambiente que já a tem e deixe a biblioteca pegá-la.
-- **Exceção da transferência única:** quando o dono manda, por escrito e na mesma sessão, pôr uma
-  credencial nomeada num destino nomeado, faça uma vez, por script que não imprime nada do conteúdo.
-  Em `try/except`, imprima só o tipo do erro. A prova é por tamanho ou pelo uso (a API respondeu 200).
-  Depois, use só pelo nome.
+- **Ler UMA vez para pôr em uso, e não tocar mais.** A regra protege contra o segredo aparecer no
+  transcript, num arquivo do projeto ou num sistema externo, e ser relido a cada sessão. Ela nunca quis
+  impedir que uma credencial nova entre em uso. Quando o dono manda, por escrito e na mesma sessão, pôr
+  uma credencial nomeada num destino nomeado (variável de ambiente, `env_file` 600 no servidor, cofre):
+  1. Faça a transferência **uma única vez**, por script em arquivo (escrito pela ferramenta de
+     escrita) que lê a origem e grava no destino **sem imprimir nada do conteúdo**: nada de print,
+     nada em argv, nada em log. Em `try/except`, imprima só o tipo do erro: a mensagem de uma exceção
+     de parse já imprimiu credenciais inteiras.
+  2. A prova é por **nome e tamanho** (`wc -c`) ou pelo **uso** (a API respondeu 200). O valor nunca
+     é a prova.
+  3. Feita a transferência, a credencial só é usada **pelo nome**, a partir do destino. A origem não é
+     lida de novo, nem nesta sessão nem nas seguintes. Precisou de novo? Pergunte ao dono.
+- **Cofre de restauração, sempre cifrado.** Cópia de credenciais para restaurar a máquina (troca de
+  sistema, formatação) só existe num cofre cifrado com senha que o dono digita: nunca em texto plano,
+  nunca em pendrive aberto, nunca em repositório. O script do cofre lê e grava sem exibir.
+- **Pasta proibida é proibida inteira.** Pasta de chaves que o dono marcou como proibida não se lê, não
+  se lista em detalhe e não se calcula hash. Nem para backup.
+- **Variável expandida também é argv.** Passar `$TOKEN` numa linha de comando põe o valor no argv do
+  processo filho e, em várias camadas de shell, no log. Para usar, deixe a biblioteca ler do ambiente,
+  ou leia num script que não imprime.
 
 O gancho `trava-segredo` aplica isto mecanicamente, para o orquestrador e para todo subagente.
 Fronteira é runtime, não prompt: regra em texto é sugestão para quem raciocina; gancho é bloqueio

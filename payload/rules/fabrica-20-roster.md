@@ -33,6 +33,11 @@ política de bot e regra que um modelo obedece em produção são concepção.
 **Sem override.** O orquestrador lança cada agente no modelo do roster. Subir de tier exige o "pode"
 do dono para aquele agente e aquela tarefa.
 
+**Esforço maior só onde encurta o caminho.** Raciocínio estendido (o modo de esforço máximo da
+sessão) vale para desenho difícil e depuração travada, nunca para reler o que já está provado no
+disco. Medido na prática: um dia de modelos caros em todo papel e "não economize" queimou quase
+metade da cota semanal; a volta ao roster padrão, com a esteira enxuta, devolveu o ritmo.
+
 ## Disciplina de executor: o brief padrão diz tudo isto
 
 - **Não lança portão nem subagente.** Ao terminar, devolve. Quem aciona o portão é o orquestrador.

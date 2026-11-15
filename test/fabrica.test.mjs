@@ -417,3 +417,33 @@ test("todo agente tem nome, descrição e modelo válidos", async () => {
     assert.match(t, new RegExp(`^---\\nname: ${n.slice(0, -3)}\\ndescription: ".+"\\nmodel: (opus|sonnet|haiku)\\n---\\n`), n);
   }
 });
+
+// ---- WSL ocioso ----
+test("wsl ocioso: só wsl como comando conta como uso; desligar e listar não", async () => {
+  const w = await import(new URL("../payload/chao-de-fabrica/hooks/wsl-ocioso.mjs", import.meta.url));
+  assert.equal(w.comandoUsaWsl('wsl.exe -- bash -lc "pytest -q"'), true);
+  assert.equal(w.comandoUsaWsl("cd x && wsl -e ls"), true);
+  assert.equal(w.comandoUsaWsl("wsl --shutdown"), false);
+  assert.equal(w.comandoUsaWsl("wsl.exe -l --running -q"), false);
+  assert.equal(w.comandoUsaWsl("node hooks/wsl-ocioso.mjs"), false);
+  assert.equal(w.comandoUsaWsl(undefined), false);
+});
+
+test("wsl ocioso: VM com processo de usuário ou container fica ligada; só sistema desliga", async () => {
+  const w = await import(new URL("../payload/chao-de-fabrica/hooks/wsl-ocioso.mjs", import.meta.url));
+  const base = "1 0 systemd\n200 1 login\n201 200 bash\n300 1 dockerd\n";
+  assert.equal(w.usoDentroDaVm(base + "---\n").ocupada, false, "console do próprio WSL não conta");
+  assert.equal(w.usoDentroDaVm(base + "400 1 python3\n---\n").ocupada, true);
+  assert.equal(w.usoDentroDaVm(base + "---\nabc123def456\n").ocupada, true);
+  assert.equal(w.usoDentroDaVm(base + "500 1 bash\n---\n").ocupada, true, "bash de outra origem conta");
+  assert.equal(w.contarWslExe('"wsl.exe","1234","Console","1","10.000 K"\n'), 1);
+  assert.equal(w.contarWslExe("INFO: No tasks are running"), 0);
+});
+
+test("wsl ocioso: fora do Windows ou sem wsl no comando, não faz nada e sai rápido", () => {
+  const estado = tmp();
+  const r = gancho("wsl-ocioso", { session_id: "s1", tool_input: { command: "ls -la" } }, estado);
+  assert.equal(r.status, 0);
+  assert.equal(existsSync(join(estado, "wsl_ocioso.log")), false);
+  rmSync(estado, { recursive: true, force: true });
+});

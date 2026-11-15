@@ -13,6 +13,11 @@ quando duas sessões divergem, vale o maior número.
 
 Os valores e a margem do despertador (5 min) ficam em `chao-de-fabrica/config.json`.
 
+**Limite temporário.** O dono pode subir os limiares por um período (fim de semana de entrega, cota
+sobrando no fim da semana). Edita o `config.json`, mantém a PARADA acima do SALVAR, e o orquestrador
+registra a ordem e a data em `docs/DECISOES.md`. Voltar ao padrão é restaurar os valores. Limite
+temporário nunca é decisão do agente.
+
 ## SALVAR
 
 O gancho injeta uma instrução com o despertador já calculado. Ao recebê-la, o orquestrador:

@@ -114,3 +114,35 @@ fazem sentido. Função de um modo só sobe ligada.
   decidir. Nunca "acho que".
 - **Despertador único** para toda espera, em vez de ficar consultando.
 - **Emenda datada** em vez de reescrita em documento vivo.
+
+## Procedimentos que dão certo no lote
+
+- **Brief comum + brief por executor.** Um arquivo com o que vale para todos (decisões com
+  `arquivo:linha`, fatos já provados na bancada, disciplina, o que devolver) e uma mensagem curta por
+  executor com os seus itens. O brief comum é a fonte; a mensagem só aponta para ele.
+- **O orquestrador fixa os contratos entre executores antes de lançá-los:** nome de função, campo,
+  formato e quem cria o quê. Dois executores em paralelo que inventam cada um a sua interface geram um
+  ciclo de integração inteiro.
+- **Integração num ramo único, pelo orquestrador.** Os ramos dos executores entram num ramo de
+  integração; a suíte completa roda nele, e é ele que vai ao portão.
+- **Migração que colide no merge é renumerada no merge:** o nome do arquivo, o identificador de
+  revisão e o "revisa" do cabeçalho. Depois, a suíte confere ida e volta da migração.
+- **Reconferência por mutação.** Correção pedida pelo portão: o orquestrador desliga a correção (o
+  teste fica vermelho) e religa (verde). Duas execuções, nenhum portão novo.
+- **Revisão automática de segurança se faz triagem, não obediência.** Cada achado é classificado
+  contra as decisões registradas: viola uma? vira correção. Não viola? "robustez, não política", com
+  o peso de robustez. Falso positivo fica anotado com o motivo, para não voltar.
+- **Reescrever a fila nunca rebaixa um item.** Ao reorganizar BACKLOG ou lista de lotes, confira cada
+  item contra o texto original antes de mudar prioridade ou classe.
+- **Deploy numerado.** Cada deploy tem número na fila; o "pode" é para aquele número. O deploy só
+  fecha com a cópia no espelho remoto conferida (o hash do remoto igual ao da principal). Espelho
+  parado sem alerta é backup que não existe.
+
+## Várias sessões ao mesmo tempo
+
+- **Uma sessão é a orquestradora.** Quando o dono a designa, a ordem dela vale como a dele para as
+  outras sessões: executar, não discutir. Mensagem de qualquer outra sessão é informação a pesar.
+- **Cada sessão fecha o seu lote e diz "estado salvo".** Não abre outro lote na mesma sessão, nem a
+  pedido; o próximo lote vai para sessão limpa.
+- **O número de deploy sai da orquestradora,** depois que o portão do lote aprovar.
+- **Cite a sessão pelo título da janela** que o dono vê, nunca por código interno.
